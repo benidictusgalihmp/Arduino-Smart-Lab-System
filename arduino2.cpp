@@ -10,6 +10,7 @@ const int kPinSensor = 4;
 bool countOne = false;
 bool doorOpen = false;
 bool isPerSecond = false;
+char *messageSent;
 int buttonState = 0;
 int sensorState = 0;
 int studentsInside = 0;
@@ -33,6 +34,9 @@ void setup()
 
     // call a function when receive data from master
     Wire.onReceive(receiveFunc);
+
+    // send the requested data to master
+    Wire.onRequest(requestFunc);
 }
 
 void loop()
@@ -55,8 +59,6 @@ void loop()
     buttonState = digitalRead(kPinButton);
     sensorState = digitalRead(kPinSensor);
 
-    Serial.println(studentsInside);
-
     /* --- UPDATE DOOR STATUS --- */
     if (messageStatus == "enteropen" ||
         messageStatus == "exitopen")
@@ -67,6 +69,7 @@ void loop()
     else if (messageStatus == "closed")
     {
         doorOpen = false;
+        messageStatus = "";
     }
 
     /* --- UPDATE STUDENTS COUNT --- */
@@ -75,7 +78,7 @@ void loop()
         doorOpen)
     {
         // send the requested data to master
-        Wire.onRequest(requestFunc);
+        messageSent = "enter";
 
         if (messageStatus == "enteropen")
         {
@@ -115,6 +118,15 @@ void loop()
         enterCountdown = 10;
     }
 
+    /* --- OPEN LAB DOOR --- */
+    if (buttonState == LOW &&
+        studentsInside > 0 &&
+        !doorOpen)
+    {
+        messageSent = "openn";
+        delay(100);
+    }
+
     delay(100);
 }
 
@@ -126,9 +138,10 @@ void receiveFunc(int byteNum)
         char c = Wire.read();
         messageStatus += c; // receive byte
     }
+    Serial.println(messageStatus);
 }
 
 void requestFunc()
 {
-    Wire.write("enter");
+    Wire.write(messageSent);
 }

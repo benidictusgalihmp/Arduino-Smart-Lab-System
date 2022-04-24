@@ -269,6 +269,12 @@ void loop()
         if (messageRequest == "enter")
         {
             servo_10.write(closeDoor);
+
+            // create transmission with address 8
+            Wire.beginTransmission(8);
+            Wire.write("closed");
+            Wire.endTransmission();
+
             enterTimeSensor = 10;
             messageRequest == "";
             isDoorOpen = false;
@@ -276,8 +282,45 @@ void loop()
         else if (enterTimeSensor <= 0)
         {
             servo_10.write(closeDoor);
+
+            // create transmission with address 8
+            Wire.beginTransmission(8);
+            Wire.write("closed");
+            Wire.endTransmission();
+
             messageRequest == "";
             isDoorOpen = false;
+        }
+    }
+    else
+    {
+        if (Wire.requestFrom(8, 5))
+        {
+            while (Wire.available())
+            {
+                char c = Wire.read();
+                messageRequest = c == 'o' ? c : messageRequest + c;
+
+                if (messageRequest.length() > 4 &&
+                    messageRequest != "openn")
+                {
+                    messageRequest = "";
+                }
+            }
+        }
+
+        if (messageRequest == "openn")
+        {
+            servo_10.write(openDoor);
+
+            // create transmission with address 8
+            Wire.beginTransmission(8);
+            Wire.write("exitopen");
+            Wire.endTransmission();
+
+            enterTimeSensor = 10;
+            messageRequest == "";
+            isDoorOpen = true;
         }
     }
 }
