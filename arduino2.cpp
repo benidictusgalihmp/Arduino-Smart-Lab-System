@@ -78,7 +78,7 @@ void loop()
         doorOpen)
     {
         // send the requested data to master
-        messageSent = "enter";
+        messageSent = "masuk";
 
         if (messageStatus == "enteropen")
         {
@@ -138,7 +138,6 @@ void receiveFunc(int byteNum)
         char c = Wire.read();
         messageStatus += c; // receive byte
     }
-    Serial.println(messageStatus);
 }
 
 void requestFunc()

@@ -252,9 +252,9 @@ void loop()
             while (Wire.available())
             {
                 char c = Wire.read();
-                messageRequest += c;
+                messageRequest = c == 'm' ? c : messageRequest + c;
                 if (messageRequest.length() > 4 &&
-                    messageRequest != "enter")
+                    messageRequest != "masuk")
                 {
                     messageRequest = "";
                 }
@@ -266,7 +266,7 @@ void loop()
             enterTimeSensor -= 1;
         }
 
-        if (messageRequest == "enter")
+        if (messageRequest == "masuk")
         {
             servo_10.write(closeDoor);
 
