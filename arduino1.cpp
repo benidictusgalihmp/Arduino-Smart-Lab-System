@@ -66,13 +66,16 @@ const int openDoor = 90;
 
 /* ----- MAIN PROGRAM ----- */
 bool isClearScreen = false;
+bool isDoorOpen = false;
 bool isPower = false;
 bool isPerSecond = false;
 bool isTimeUp = false;
 int entryCountdown = 15;
 int entryCooldown = 10;
+int enterTimeSensor = 10;
 String keypadEntry = "";
 String password = "5432";
+String messageRequest = "";
 unsigned long startMillis = 0;
 unsigned long currentMillis;
 unsigned long period = 1000;
@@ -171,6 +174,7 @@ void loop()
             // entry password is correct
             if (keypadEntry == password)
             {
+                isDoorOpen = true;
                 servo_10.write(openDoor);
 
                 lcd.setCursor(0, 0);
@@ -237,6 +241,43 @@ void loop()
             isTimeUp = false;
             keypadEntry = "";
             delay(500);
+        }
+    }
+
+    /* --- DOOR LAB HANDLING --- */
+    if (isDoorOpen)
+    {
+        if (Wire.requestFrom(8, 5))
+        {
+            while (Wire.available())
+            {
+                char c = Wire.read();
+                messageRequest += c;
+                if (messageRequest.length() > 4 &&
+                    messageRequest != "enter")
+                {
+                    messageRequest = "";
+                }
+            }
+        }
+
+        if (isPerSecond)
+        {
+            enterTimeSensor -= 1;
+        }
+
+        if (messageRequest == "enter")
+        {
+            servo_10.write(closeDoor);
+            enterTimeSensor = 10;
+            messageRequest == "";
+            isDoorOpen = false;
+        }
+        else if (enterTimeSensor <= 0)
+        {
+            servo_10.write(closeDoor);
+            messageRequest == "";
+            isDoorOpen = false;
         }
     }
 }
