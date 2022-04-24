@@ -57,7 +57,7 @@ Keypad inputKeypad = Keypad(
 /* ----- LCD SETUP ----- */
 
 // set lcd position pin
-LiquidCrystal lcd(A5, A4, A3, A2, A1, A0);
+LiquidCrystal lcd(11, 12, A3, A2, A1, A0);
 
 /* ----- SERVO SETUP ----- */
 Servo servo_10;

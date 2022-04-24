@@ -127,6 +127,8 @@ void loop()
         delay(100);
     }
 
+    // Serial.print("Students: ");
+    // Serial.println(studentsInside);
     delay(100);
 }
 
@@ -143,4 +145,5 @@ void receiveFunc(int byteNum)
 void requestFunc()
 {
     Wire.write(messageSent);
+    messageSent = "";
 }
